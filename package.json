@@ -1,0 +1,40 @@
+{
+  "name": "teslams-rdkafka",
+  "version": "0.0.1",
+  "description": "Stream Tesla telemetry into Apache Kafka using librdkafka C/C++ library",
+  "dependencies": {
+    "teslams": "~1.1.6",
+    "json-bigint": ">= 0.1.4",
+    "optimist": "~0.3.5",
+    "request": ">=2.14.0",
+    "node-rdkafka": ">=0.6.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hjespers/teslams-kafka.git"
+  },
+  "main": "./teslams.js",
+  "directories": {
+    "lib": ".",
+    "example": "examples"
+  },
+  "bin": {
+    "teslams-rdkafka": "./rdkstreaming.js"
+  },
+  "keywords": [
+    "tesla",
+    "kafka"
+  ],
+  "author": {
+    "name": "Hans Jespersen",
+    "email": "hans.jespersen@gmail.com",
+    "url": "https://github.com/hjespers/teslams"
+  },
+  "contributors": [
+  ],
+  "license": "BSD"
+}

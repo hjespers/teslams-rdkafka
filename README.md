@@ -37,12 +37,10 @@ In addition to putting your password as a command line option or a file, you can
 
 #rdkstreaming.js - Capture and log real-time telemetry to Apache Kafka for analytics 
 
-<img src=http://farm9.staticflickr.com/8241/8526534730_75643b3247_c.jpg>
-
-An application which uses the TESLA HTTP Long Polling "STREAMING" API to get continuous telemetry from the Tesla Model S. 
+An application which uses the TESLA HTTP Long Polling "STREAMING" API to get continuous telemetry from a Tesla Model S or Model X. 
 A valid teslamotors.com login and password is required and must be provided on the command line options. 
 
-By default the output is a stream of AVRO formatted messages published to a Kafka topic called "teslams". The output topic can be changed by adding the --topic command line option.
+By default the output is a stream of JSON formatted messages published to a set of Kafka topics called "teslams", "teslams.climate_state", and "teslams.charge_state" with the keys being the `id` if the vehicle. The output topic prefix can be changed by using the --topic command line option.
 
 To execute run:
 
@@ -52,7 +50,7 @@ For help run :
 
 	rdkstreaming --help
 
-	Usage: kstreaming -u <username> -p <password> [--topic <topic_name>] [--silent]
+	Usage: rdkstreaming -u <username> -p <password> [--topic <topic_name>] [--silent]
 
 	Options:
 		  -u, --username  Teslamotors.com login                  [required]

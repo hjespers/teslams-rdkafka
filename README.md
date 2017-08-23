@@ -10,22 +10,54 @@ Use these programs at your own risk. The authors do not guaranteed the proper fu
 # Contributors
 Hans Jespersen (https://github.com/hjespers)
 
+# Dependencies
+
+Linux dependencies
+
+* openssl
+* libssl-dev
+* libsasl2-dev
+* libsasl2-modules
+* C++ toolchain
+
+macOS dependencies
+
+* Apple Xcode command line tools (for the compiler)
+* openssl installed via Brew (needed for root certs file in `/usr/local/etc/openssl/cert.pem`)
+* Export CPPFLAGS=-I/usr/local/opt/openssl/include and LDFLAGS=-L/usr/local/opt/openssl/lib
+
+
+
 # Installation
 
-To use these programs you must download and install 'node' from http://nodejs.org
-. Once node is installed, use the included 'npm' utility to download and install the teslams tools and all it's dependent modules
+To use this program you must download and install 'node' from http://nodejs.org
 
-	npm install -g teslams-rdkafka
-	
-or if you are not logged in as the root (administrator) use:
-	
-	sudo npm install -g teslams-rdkafka
+Install from npm on macOS
 
-Alternatively, to run from github sources, clone teslams, go to the main folder and run
+  brew install openssl
+  export CPPFLAGS=-I/usr/local/opt/openssl/include
+  export LDFLAGS=-L/usr/local/opt/openssl/lib
+  sudo -E npm install -g teslams-rdkafka
 
-	npm install
+Install from npm on Ubuntu
 
-All example programs normally require -u and -p in order to specify the Tesla Motors user name and password to access your Model S.
+  sudo apt install nodejs-legacy
+  sudo apt install openssl libssl-dev libsasl2-dev libsasl2-modules
+  sudo npm install -g teslams-rdkafka
+
+Install from npm on CentOS
+
+  sudo yum install epel-release nodejs
+  sudo yum install openssl openssl-devel cyrus-sasl-devel
+  sudo npm install -g teslams-rdkafka
+
+# Uninstall
+
+  sudo npm uninstall -g ccloud-node-console-client
+
+# Useage
+
+The program requires -u and -p in order to specify the Tesla Motors user name and password to access your Model S.
 Or, you can instead create a json file in ~/.teslams/config.json and specify them once, in the following format:
 
 	{
@@ -35,7 +67,7 @@ Or, you can instead create a json file in ~/.teslams/config.json and specify the
 	
 In addition to putting your password as a command line option or a file, you can alternatively use the $TSLA_USERNAME and $TSLA_PASSWORD environment variables. These environment variable allow the execution of these apps in Heroku or other Platform-as-a-Service providers.
 
-# rdkstreaming.js - Capture and log real-time telemetry to Apache Kafka for analytics 
+# teslams-rdkafka - Capture and log real-time telemetry to Apache Kafka for analytics 
 
 An application which uses the TESLA HTTP Long Polling "STREAMING" API to get continuous telemetry from a Tesla Model S or Model X. 
 A valid teslamotors.com login and password is required and must be provided on the command line options. 
@@ -45,9 +77,9 @@ By default the output is a stream of JSON formatted messages published to a set 
 To execute run:
 
 ```
-rdkstreaming -u <username> -p <password> -U <kafka_username> -P <kafka_password> --kafka localhost:9092 --topic my_kafka_topic 
+teslams-rdkafka -u <username> -p <password> -U <kafka_username> -P <kafka_password> --kafka localhost:9092 --topic my_kafka_topic 
 
-Usage: rdkstreaming -u <username> -p <password> -U <kafka_username> -P <kafka_password> [-sz]
+Usage: teslams-rdkafka -u <username> -p <password> -U <kafka_username> -P <kafka_password> [-sz]
         [--kafka localhost:9092] [--topic my_kafka_topic] [--ca_cert_loc /usr/local/etc/openssl/cert.pem]
         [--values <value list>] [--maxrpm <#num>] [--vehicle offset] [--naptime <#num_mins>]
 
@@ -68,6 +100,28 @@ Options:
   -S, --sleepcheck     Number of minutes between sleep checks                                       [default: 1]
   -v, --values         List of values to collect                                                    [default: "speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range,heading"]
   -?, --help           Print usage information     ```                                 
+
+# Troubleshooting
+
+If you see the following error when you run either console producer or consumer, it means you have not installed librdkafka correctly with the required SSL and SASL libraries. See install instructions for installing openssl and setting compiler flags.
+
+  Caught error: Error: Invalid value for configuration property "security.protocol"
+
+If the ccloud-console-producer or ccloud-console-consumer immediately exits to the shell prompt you are likely missing the Root CA Certificates. See the location of these certs (below) and add the correct `-S` flag pointing the the location of the certs on your operating system.
+  
+The default SSL Certificate location is `/usr/local/etc/openssl/cert.pem`  which works on macOS but every flavor of Linux puts root certificates in different places.
+
+  Ubuntu/Debian/Raspbian: /etc/ssl/certs
+  CentOS/RedHat: /etc/pki/tls/cert.pem
+  macOS: /usr/local/etc/openssl/cert.pem (from `brew install openssl`)
+
+For Ubuntu add the `-C /etc/ssl/certs` flag to specify your certificate location:
+
+  teslams-rdkafka -u teslaowner@yahoo.com -p MyTeslaPassword -U $CCLOUD_SASL_USERNAME -P $CCLOUD_SASL_PASSWORD -k $CCLOUD_BROKERS -C /etc/ssl/certs
+  
+For CentOS/RedHat add the `-C /etc/pki/tls/cert.pem` flag to specify your certificate location:
+
+  teslams-rdkafka -u teslaowner@yahoo.com -p MyTeslaPassword -U $CCLOUD_SASL_USERNAME -P $CCLOUD_SASL_PASSWORD -k $CCLOUD_BROKERS -C /etc/pki/tls/cert.pem 
 
 # Feedback and Support
 

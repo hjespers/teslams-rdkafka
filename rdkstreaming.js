@@ -17,9 +17,9 @@ function argchecker( argv ) {
     if (argv.topic === "") throw 'Kafka topic is unspecified. Use -t, --topic <topic>';
 }
 
-var usage = 'Usage: $0 -u <username> -p <password> [-sz] \n' +
-    '   [--kafka <localhost:9092>] [--topic <my_kafka_topic>] \n' +
-    '   [--values <value list>] [--maxrpm <#num>] [--vehicle offset] [--naptime <#num_mins>]'; 
+var usage = 'Usage: rdkstreaming -u <username> -p <password> -U <kafka_username> -P <kafka_password> [-sz] \n' +
+    '        [--kafka localhost:9092] [--topic my_kafka_topic] [--ca_cert_loc /usr/local/etc/openssl/cert.pem]\n' +
+    '        [--values <value list>] [--maxrpm <#num>] [--vehicle offset] [--naptime <#num_mins>]';
 
 var s_url = 'https://streaming.vn.teslamotors.com/stream/';
 var firstTime = true;
@@ -47,6 +47,13 @@ var argv = require('optimist')
     .describe('u', 'Teslamotors.com login')
     .alias('p', 'password')
     .describe('p', 'Teslamotors.com password')
+    .alias('U', 'sasl_username')
+    .describe('U', 'Confluent Cloud login')
+    .alias('P', 'sasl_password')
+    .describe('P', 'Confluent Cloud password')
+    .alias('C', 'ca_cert_loc')
+    .describe('C', 'location of SSL Certs')
+    .default('C', '/usr/local/etc/openssl/cert.pem')    
     .alias('s', 'silent')
     .describe('s', 'Silent mode: no output to console')
     .alias('z', 'zzz')
@@ -57,13 +64,10 @@ var argv = require('optimist')
     .default('r', 6)
     .alias('k', 'kafka')
     .describe('k', 'Kafka bootstrap servers')
-    .default('k', 'localhost:9092')
     .alias('t', 'topic')
     .describe('t', 'Kafka publish topic')
     .default('t', 'teslams')
     .alias('f', 'format')
-    .describe('f', 'Publish message format (i.e. avro or binary')
-    .default('f', 'binary')
     .alias('n', 'naptime')
     .describe('n', 'Number of minutes to nap')
     .default('n', 30)
@@ -80,7 +84,8 @@ var argv = require('optimist')
     .describe('v', 'List of values to collect')
     .default('v', 'speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range,heading')
     .alias('?', 'help')
-    .describe('?', 'Print usage information');
+    .describe('?', 'Print usage information')
+    .demand(['U','P', 'k']);
 
 // get credentials either from command line or ~/.teslams/config.json
 var creds = require('./config.js').config(argv);
@@ -99,6 +104,12 @@ if ( argv.help == true ) {
 try {
     var producer = new Kafka.Producer({
         'client.id': 'teslams-rdkafka',
+        'security.protocol': 'sasl_ssl',
+        'sasl.mechanisms': 'PLAIN',
+        'sasl.username': argv.sasl_username,   // Confluent Cloud username
+        'sasl.password': argv.sasl_password,   // Confluent Cloud password
+        'ssl.ca.location': argv.ca_cert_loc,   // Location of SSL CA Certs (on macOS)
+        'api.version.request': true,
         'metadata.broker.list': argv.kafka
     }); 
 
@@ -124,89 +135,6 @@ try {
     console.log(e);
     process.exit(1);
 }   
-
-
-//var key_schema = new KafkaRest.AvroSchema("string");
-// var value_schema = new KafkaRest.AvroSchema({
-//   "namespace": "teslams",
-//   "type": "record",
-//   "name": "streamdata",
-//   "fields": [
-//     {
-//       "name": "id_s",
-//       "type": "string"
-//     },
-//     {
-//       "name": "vehicle_id",
-//       "type": "string"
-//     },
-//     {
-//       "name": "timestamp",
-//       "type": "long"
-//     },
-//     {
-//       "name": "speed",
-//       "type": [
-//         "null",
-//         "int"
-//       ]
-//     },
-//     {
-//       "name": "odometer",
-//       "type": "float"
-//     },
-//     {
-//       "name": "soc",
-//       "type": "int"
-//     },
-//     {
-//       "name": "elevation",
-//       "type": "int"
-//     },
-//     {
-//       "name": "est_heading",
-//       "type": "int"
-//     },
-//     {
-//       "name": "est_lat",
-//       "type": "float"
-//     },
-//     {
-//       "name": "est_lng",
-//       "type": "float"
-//     },
-//     {
-//       "name": "power",
-//       "type": "int"
-//     },
-//     {
-//       "name": "shift_state",
-//       "type": [
-//         "null",
-//         "string"
-//       ],
-//       "doc": "the current shift state of the car",
-//       "symbolDocs": {
-//         "P": "Parked",
-//         "D": "Drive",
-//         "R": "Reverse",
-//         "null": "Not Provided"
-//       }
-//     },
-//     {
-//       "name": "range",
-//       "type": "int"
-//     },
-//     {
-//       "name": "est_range",
-//       "type": "int"
-//     },
-//     {
-//       "name": "heading",
-//       "type": "int"
-//     }
-//   ]
-// });
 
 
 function tsla_poll( vid, long_vid, token ) {    
@@ -425,31 +353,19 @@ function tsla_poll( vid, long_vid, token ) {
                     heading : Number( array[12] )
                 };
                 if (!argv.silent) { 
-                    ulog( 'streamdata is: ' + util.inspect(streamdata));
+                    //ulog( 'streamdata is: ' + util.inspect(streamdata));
                 }
                 // Publish message
                     try {
-                        if (argv.format == "avro") {
-                            console.log('publishing kafka avro data: ' + vin + ',' + util.inspect(streamdata) );
-                            //TODO: AVRO Publish with librdkafka
-                            //kafka_topic.produce(key_schema, value_schema, { 'key': '12345', 'value': streamdata }, function(err, res) {
-                            //    if (err) {
-                            //        console.log('Kafka publishing error: ' + err );
-                            //    } else {
-                            //        console.log('Kafka publishing response: ' + util.inspect(res));
-                            //    }
-                            //}); 
-                        } else {
-                            // binary JSON kafka publish
-                            console.log('publishing binary JSON kafka data: ' + JSON.stringify(streamdata));
-                            producer.produce(
-                              argv.topic,                               //topic
-                              null,                                     //partition
-                              new Buffer(JSON.stringify(streamdata)),   //value
-                              streamdata.vehicle_id,                    // key
-                              streamdata.timestamp                      //timestamp
-                            );
-                        }
+                        // binary JSON kafka publish
+                        console.log('publishing binary JSON kafka data: ' + JSON.stringify(streamdata));
+                        producer.produce(
+                            argv.topic,                               //topic
+                            null,                                     //partition
+                            new Buffer(JSON.stringify(streamdata)),   //value
+                            streamdata.vehicle_id,                    // key
+                            streamdata.timestamp                      //timestamp
+                        );
                     } catch (error) {
                         // failed to send, therefore stop publishing and log the error thrown
                         console.log('Error while publishing message to kafka broker: ' + error.toString());

@@ -34,26 +34,34 @@ To use this program you must download and install 'node' from http://nodejs.org
 
 Install from npm on macOS
 
+```
   brew install openssl
   export CPPFLAGS=-I/usr/local/opt/openssl/include
   export LDFLAGS=-L/usr/local/opt/openssl/lib
   sudo -E npm install -g teslams-rdkafka
+```
 
 Install from npm on Ubuntu
 
+```
   sudo apt install nodejs-legacy
   sudo apt install openssl libssl-dev libsasl2-dev libsasl2-modules
   sudo npm install -g teslams-rdkafka
+```
 
 Install from npm on CentOS
 
+```
   sudo yum install epel-release nodejs
   sudo yum install openssl openssl-devel cyrus-sasl-devel
   sudo npm install -g teslams-rdkafka
+```
 
 # Uninstall
 
+```
   sudo npm uninstall -g ccloud-node-console-client
+```
 
 # Useage
 

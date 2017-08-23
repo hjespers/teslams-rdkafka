@@ -44,20 +44,30 @@ By default the output is a stream of JSON formatted messages published to a set 
 
 To execute run:
 
-	rdkstreaming -u <username> -p <password> 
+```
+rdkstreaming -u <username> -p <password> -U <kafka_username> -P <kafka_password> --kafka localhost:9092 --topic my_kafka_topic 
 
-For help run :
+Usage: rdkstreaming -u <username> -p <password> -U <kafka_username> -P <kafka_password> [-sz]
+        [--kafka localhost:9092] [--topic my_kafka_topic] [--ca_cert_loc /usr/local/etc/openssl/cert.pem]
+        [--values <value list>] [--maxrpm <#num>] [--vehicle offset] [--naptime <#num_mins>]
 
-	rdkstreaming --help
-
-	Usage: rdkstreaming -u <username> -p <password> [--topic <topic_name>] [--silent]
-
-	Options:
-		  -u, --username  Teslamotors.com login                  [required]
-		  -p, --password  Teslamotors.com password               [required]
-		  -s, --silent    Silent mode: no output to console      [boolean]
-		  -t, --topic     Kafka publish topic
-		  -?, --help      Print usage information                                            
+Options:
+  -u, --username       Teslamotors.com login
+  -p, --password       Teslamotors.com password
+  -U, --sasl_username  Confluent Cloud login                                                        [required]
+  -P, --sasl_password  Confluent Cloud password                                                     [required]
+  -C, --ca_cert_loc    location of SSL Certs                                                        [default: "/usr/local/etc/openssl/cert.pem"]
+  -s, --silent         Silent mode: no output to console                                            [boolean]
+  -z, --zzz            enable sleep mode checking                                                   [boolean]
+  -r, --maxrpm         Maximum number of requests per minute                                        [default: 6]
+  -k, --kafka          Kafka bootstrap servers                                                      [required]
+  -t, --topic          Kafka publish topic                                                          [default: "teslams"]
+  -n, --naptime        Number of minutes to nap                                                     [default: 30]
+  -N, --napcheck       Number of minutes between nap checks                                         [default: 1]
+  -O, --vehicle        Select the vehicle offset (i.e. 0 or 1) for accounts with multiple vehicles  [default: 0]
+  -S, --sleepcheck     Number of minutes between sleep checks                                       [default: 1]
+  -v, --values         List of values to collect                                                    [default: "speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range,heading"]
+  -?, --help           Print usage information     ```                                 
 
 #Feedback and Support
 

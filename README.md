@@ -127,11 +127,15 @@ The default SSL Certificate location is `/usr/local/etc/openssl/cert.pem`  which
 
 For Ubuntu add the `-C /etc/ssl/certs` flag to specify your certificate location:
 
-  teslams-rdkafka -u teslaowner@yahoo.com -p MyTeslaPassword -U $CCLOUD_SASL_USERNAME -P $CCLOUD_SASL_PASSWORD -k $CCLOUD_BROKERS -C /etc/ssl/certs
-  
+```
+teslams-rdkafka -u teslaowner@yahoo.com -p MyTeslaPassword -U $CCLOUD_SASL_USERNAME -P $CCLOUD_SASL_PASSWORD -k $CCLOUD_BROKERS -C /etc/ssl/certs
+```
+
 For CentOS/RedHat add the `-C /etc/pki/tls/cert.pem` flag to specify your certificate location:
 
-  teslams-rdkafka -u teslaowner@yahoo.com -p MyTeslaPassword -U $CCLOUD_SASL_USERNAME -P $CCLOUD_SASL_PASSWORD -k $CCLOUD_BROKERS -C /etc/pki/tls/cert.pem 
+```
+teslams-rdkafka -u teslaowner@yahoo.com -p MyTeslaPassword -U $CCLOUD_SASL_USERNAME -P $CCLOUD_SASL_PASSWORD -k $CCLOUD_BROKERS -C /etc/pki/tls/cert.pem 
+```
 
 # Feedback and Support
 

@@ -1,16 +1,16 @@
-#Tesla Telemetry gateway for Apache Kafka
+# Tesla Telemetry gateway for Apache Kafka
 
 
 An implementation in Node.js of the streaming telemetry interface of Tesla Motors with output to Apache Kafka.  
 
-#Disclaimer
+# Disclaimer
 
 Use these programs at your own risk. The authors do not guaranteed the proper functioning of these applications. This code attempts to use the same interfaces used by the official Tesla phone apps. However, it is possible that use of this code may cause unexpected damage for which nobody but you are responsible. 
 
-#Contributors
+# Contributors
 Hans Jespersen (https://github.com/hjespers)
 
-#Installation
+# Installation
 
 To use these programs you must download and install 'node' from http://nodejs.org
 . Once node is installed, use the included 'npm' utility to download and install the teslams tools and all it's dependent modules
@@ -35,7 +35,7 @@ Or, you can instead create a json file in ~/.teslams/config.json and specify the
 	
 In addition to putting your password as a command line option or a file, you can alternatively use the $TSLA_USERNAME and $TSLA_PASSWORD environment variables. These environment variable allow the execution of these apps in Heroku or other Platform-as-a-Service providers.
 
-#rdkstreaming.js - Capture and log real-time telemetry to Apache Kafka for analytics 
+# rdkstreaming.js - Capture and log real-time telemetry to Apache Kafka for analytics 
 
 An application which uses the TESLA HTTP Long Polling "STREAMING" API to get continuous telemetry from a Tesla Model S or Model X. 
 A valid teslamotors.com login and password is required and must be provided on the command line options. 
@@ -69,7 +69,7 @@ Options:
   -v, --values         List of values to collect                                                    [default: "speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range,heading"]
   -?, --help           Print usage information     ```                                 
 
-#Feedback and Support
+# Feedback and Support
 
 For more information, feedback, or community support see the Tesla Motors Club forum at http://www.teslamotorsclub.com/showthread.php/13410-Model-S-REST-API or email teslams@googlegroups.com
 

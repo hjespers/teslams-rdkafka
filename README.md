@@ -99,7 +99,9 @@ Options:
   -O, --vehicle        Select the vehicle offset (i.e. 0 or 1) for accounts with multiple vehicles  [default: 0]
   -S, --sleepcheck     Number of minutes between sleep checks                                       [default: 1]
   -v, --values         List of values to collect                                                    [default: "speed,odometer,soc,elevation,est_heading,est_lat,est_lng,power,shift_state,range,est_range,heading"]
-  -?, --help           Print usage information     ```                                 
+  -?, --help           Print usage information     
+
+```                                 
 
 # Troubleshooting
 

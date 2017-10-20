@@ -7,7 +7,7 @@
     "json-bigint": ">= 0.1.4",
     "optimist": "~0.3.5",
     "request": ">=2.14.0",
-    "node-rdkafka": ">=1.0.4"
+    "node-rdkafka": ">=2.1.1"
   },
   "devDependencies": {},
   "scripts": {

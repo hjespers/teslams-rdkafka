@@ -1,9 +1,9 @@
 {
   "name": "teslams-rdkafka",
-  "version": "0.0.2",
+  "version": "0.3.0",
   "description": "Stream Tesla telemetry into Apache Kafka using librdkafka C/C++ library",
   "dependencies": {
-    "teslams": "~1.1.6",
+    "teslams": ">=1.3.0",
     "json-bigint": ">= 0.1.4",
     "optimist": "~0.3.5",
     "request": ">=2.14.0",

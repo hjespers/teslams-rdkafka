@@ -265,10 +265,17 @@ function tsla_poll( vid, long_vid, token ) {
     request({'uri': s_url + long_vid +'/?values=' + argv.values,
             'method' : 'GET',
             'auth': {'user': creds.username,'pass': token},
-            'timeout' : 125000 // a bit more than the expected 2 minute max long poll
+            //'timeout' : 125000 // a bit more than the expected 2 minute max long poll
+            'timeout' : 325000 // a bit longer than a 5 minute max long poll
             }, function( error, response, body) {
         if ( error ) { // HTTP Error
             ulog( 'Polling again because poll returned HTTP error:' + error );
+            if (error.code === 'ETIMEDOUT'); {
+                ulog('Got a ETIMEDOUT error');
+                ulog('err.connect = ' + error.connect );
+                ulog('true means connection timeout, otherwise false/undefined means read timeout');
+            }
+
             // put short delay to avoid infinite recursive loop and stack overflow
             setTimeout(function() {
                 tsla_poll( vid, long_vid, token ); // poll again
@@ -333,13 +340,14 @@ function tsla_poll( vid, long_vid, token ) {
 		} else {
             if (argv.topic) {
                 //publish to Kafka broker on specified topic
-                var newchunk = d.replace(/[\n\r]/g, '');
+                var newchunk = d.replace(/[\n\r]/g, ''); //TODO: debug why some lines are not split correctly. Maybe missing newline or carriage return
                 var array = newchunk.split(',');
                 var streamdata = { 
                     id_s : vid.toString(),
                     vehicle_id : long_vid.toString(),
                     timestamp : Number( array[0] ), 
-                    speed : (array[1] === "") ? null:{"int": Number( array[1] )}, 
+                    //speed : (array[1] === "") ? null:{"int": Number( array[1] )}, 
+                    speed : (array[1] === "") ? null:Number( array[1] ), 
                     odometer : Number( array[2] ), 
                     soc : Number( array[3] ), 
                     elevation : Number( array[4] ), 
@@ -347,7 +355,8 @@ function tsla_poll( vid, long_vid, token ) {
                     est_lat : Number( array[6] ), 
                     est_lng : Number( array[7] ), 
                     power : Number( array[8] ), 
-                    shift_state : (array[9] === "") ? null:{"string": array[9].toString()},
+                    //shift_state : (array[9] === "") ? null:{"string": array[9].toString()},
+                    shift_state : (array[9] === "") ? null:array[9].toString(),
                     range : Number( array[10] ),
                     est_range : Number( array[11] ),
                     heading : Number( array[12] )
